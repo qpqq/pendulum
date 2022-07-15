@@ -1,0 +1,50 @@
+#include "pendulum.hpp"
+
+int main() {
+    // create the window
+    sf::RenderWindow window(sf::VideoMode(854, 480), "Particles");
+    window.setVerticalSyncEnabled(true); // vertical synchronization
+
+    // create the pendulum
+    Pendulum pendulum(1, 120.f);
+
+    // create a clock to track the elapsed time
+    sf::Clock clock;
+
+    // run the main loop
+    while (window.isOpen()) {
+
+        // handle events
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                pendulum.press(sf::Mouse::getPosition(window));
+            }
+
+            if (event.type == sf::Event::MouseMoved) {
+                pendulum.move(sf::Mouse::getPosition(window));
+            }
+
+            if (event.type == sf::Event::MouseButtonReleased) {
+                pendulum.release(sf::Mouse::getPosition(window));
+            }
+
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Space)
+                    pendulum.hold();
+            }
+        }
+
+        // update it
+        sf::Time elapsed = clock.restart();
+        pendulum.update(elapsed);
+
+        // draw it
+        window.clear();
+        window.draw(pendulum);
+        window.display();
+    }
+}
