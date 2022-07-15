@@ -5,13 +5,14 @@ void Pendulum::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
 
     // draw
+    target.draw(&trail[0], trail.size(), sf::LineStrip);
     target.draw(line, 2, sf::Lines, states);
     target.draw(circle, states);
 }
 
 void Pendulum::updateFigures() {
-    line[0] = sf::Vertex(pivot);
-    line[1] = sf::Vertex(point);
+    line[0] = sf::Vertex(pivot, white);
+    line[1] = sf::Vertex(point, white);
 
     circle.setPosition(point.x - circleRadius,
                        point.y - circleRadius);
@@ -21,7 +22,7 @@ Pendulum::Pendulum(float mass, float length) {
     this->length = length;
     this->mass = mass;
 
-    pivot = origin;
+    pivot = pivotOrigin;
     point.x = pivot.x + length;
     point.y = pivot.y;
 
@@ -29,11 +30,15 @@ Pendulum::Pendulum(float mass, float length) {
     angleV = 0;
     angleA = 0;
 
+    circle.setFillColor(white);
     circle.setRadius(circleRadius);
     circle.setPointCount(circleSides);
 
     isHold = false;
     isClicked = false;
+
+    sf::Vertex trailPoint = {point, cyan};
+    trail.push_back(trailPoint);
 
     updateFigures();
 }
@@ -49,6 +54,16 @@ void Pendulum::update(sf::Time elapsed) {
 
     point.x = pivot.x + length * std::sin(angle);
     point.y = pivot.y + length * std::cos(angle);
+
+    sf::Vertex trailPoint = {point, cyan};
+    if (trail.size() < trailSize)
+        trail.push_back(trailPoint);
+    else {
+        for (int i = 0; i < trailSize; i++)
+            trail[i] = trail[i + 1];
+
+        trail[trailSize - 1] = trailPoint;
+    }
 
     updateFigures();
 }
@@ -92,6 +107,8 @@ void Pendulum::release(sf::Vector2i mousePos) {
 
     if (!circle.getGlobalBounds().contains(x, y))
         return;
+
+    trail.clear();
 
     isHold = false;
     isClicked = false;

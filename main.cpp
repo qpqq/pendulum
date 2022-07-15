@@ -1,12 +1,19 @@
 #include "pendulum.hpp"
 
 int main() {
+    // antialiasing shapes
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+
     // create the window
-    sf::RenderWindow window(sf::VideoMode(854, 480), "Particles");
+    sf::RenderWindow window(sf::VideoMode(800, 500),
+                            "Particles",
+                            sf::Style::Default,
+                            settings);
     window.setVerticalSyncEnabled(true); // vertical synchronization
 
     // create the pendulum
-    Pendulum pendulum(1, 120.f);
+    Pendulum pendulum(1, 200.f);
 
     // create a clock to track the elapsed time
     sf::Clock clock;

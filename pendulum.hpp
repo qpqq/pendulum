@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iostream>
-#include <queue>
+#include <vector>
 
 #include <SFML/Graphics.hpp>
 
@@ -10,11 +10,13 @@ class Pendulum : public sf::Drawable, public sf::Transformable {
 private:
 
     const float gravity = 9.8;
-    const sf::Vector2f origin = {250.f, 100.f};
+    const sf::Vector2f pivotOrigin = {400.f, 100.f};
+    const sf::Color white = sf::Color(255, 255, 255);
+    const sf::Color cyan = sf::Color(51, 204, 204);
     const float circleRadius = 10.f;
     const int circleSides = 500;
     const float rate = 100;
-    static const int trailSize = 100;
+    const int trailSize = 50;
 
     float angle;
     float angleV;
@@ -26,7 +28,7 @@ private:
     sf::Vector2f point;
     sf::Vertex line[2];
     sf::CircleShape circle;
-    sf::Vertex trail[trailSize];
+    std::vector<sf::Vertex> trail;
 
     bool isHold;
     bool isClicked;
