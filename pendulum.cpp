@@ -5,6 +5,7 @@ void Pendulum::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
 
     // draw
+    target.draw(&trailWide[0], trailWide.size(), sf::TriangleFan);
     target.draw(&trail[0], trail.size(), sf::LineStrip);
     target.draw(line, 2, sf::Lines, states);
     target.draw(circle, states);
@@ -37,10 +38,38 @@ Pendulum::Pendulum(float mass, float length) {
     isHold = false;
     isClicked = false;
 
-    sf::Vertex trailPoint = {point, cyan};
-    trail.push_back(trailPoint);
-
+    createTrail();
     updateFigures();
+}
+
+void Pendulum::createTrail() {
+    sf::Vertex trailPoint;
+
+    trailPoint = {point, cyan};
+    trailPoint.color.a = 255;
+    trail = std::vector<sf::Vertex>(trailSize, trailPoint);
+    trailPoint = {pivot, cyan};
+    trailPoint.color.a = 0;
+    trailWide = std::vector<sf::Vertex>(trailSize + 1, trailPoint);
+}
+
+void Pendulum::updateTrail() {
+    float _opacity;
+    sf::Vertex trailPoint = {point, cyan};
+
+    _opacity = 255 / (float) (trailSize - 1);
+    for (int i = 0; i < trailSize - 1; i++) {
+        trail[i] = trail[i + 1];
+        trail[i].color.a = (int) (_opacity * (float) i);
+    }
+    trail[trailSize - 1] = trailPoint;
+
+    _opacity = 255 / (float) trailSize;
+    for (int i = 1; i < trailSize; i++) {
+        trailWide[i] = trailWide[i + 1];
+        trailWide[i].color.a = (int) (_opacity * (float) i);
+    }
+    trailWide[trailSize] = trailPoint;
 }
 
 void Pendulum::update(sf::Time elapsed) {
@@ -55,16 +84,7 @@ void Pendulum::update(sf::Time elapsed) {
     point.x = pivot.x + length * std::sin(angle);
     point.y = pivot.y + length * std::cos(angle);
 
-    sf::Vertex trailPoint = {point, cyan};
-    if (trail.size() < trailSize)
-        trail.push_back(trailPoint);
-    else {
-        for (int i = 0; i < trailSize; i++)
-            trail[i] = trail[i + 1];
-
-        trail[trailSize - 1] = trailPoint;
-    }
-
+    updateTrail();
     updateFigures();
 }
 
@@ -108,7 +128,7 @@ void Pendulum::release(sf::Vector2i mousePos) {
     if (!circle.getGlobalBounds().contains(x, y))
         return;
 
-    trail.clear();
+    createTrail();
 
     isHold = false;
     isClicked = false;

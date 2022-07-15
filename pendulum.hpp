@@ -11,8 +11,8 @@ private:
 
     const float gravity = 9.8;
     const sf::Vector2f pivotOrigin = {400.f, 100.f};
-    const sf::Color white = sf::Color(255, 255, 255);
-    const sf::Color cyan = sf::Color(51, 204, 204);
+    const sf::Color white = sf::Color(255, 255, 255, 255);
+    const sf::Color cyan = sf::Color(51, 204, 204, 255);
     const float circleRadius = 10.f;
     const int circleSides = 500;
     const float rate = 100;
@@ -29,6 +29,7 @@ private:
     sf::Vertex line[2];
     sf::CircleShape circle;
     std::vector<sf::Vertex> trail;
+    std::vector<sf::Vertex> trailWide;
 
     bool isHold;
     bool isClicked;
@@ -40,6 +41,10 @@ public:
     void updateFigures();
 
     Pendulum(float mass, float length);
+
+    void createTrail();
+
+    void updateTrail();
 
     void update(sf::Time elapsed);
 
